@@ -28,12 +28,6 @@ const User = sequelize.define('user', {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
-    // setter method, hash user password before save to db. db only store hashed password.
-    set(value) {
-      const salt = bcrypt.genSaltSync(12);
-      const hash = bcrypt.hashSync(value, salt);
-      this.setDataValue('password', hash);
-    },
   },
   avatar: {
     type: DataTypes.STRING,
@@ -45,4 +39,3 @@ User.sync({ force: true })
   .catch((err) => console.log('Something wrong with User table creation'));
 
 module.exports = User;
-

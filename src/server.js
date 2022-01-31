@@ -1,8 +1,6 @@
 const dotenv = require('dotenv');
 dotenv.config();
 
-// Database connection
-
 // Database
 const sequelize = require('./config/database.js')
 
