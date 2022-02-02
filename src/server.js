@@ -2,18 +2,20 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // Database
-const sequelize = require('./config/database.js')
+const sequelize = require('./config/database.js');
 
 const express = require('express');
 const app = express();
-const cors = require('cors')
-const port = process.env.PORT || 5500
+const cors = require('cors');
+const port = process.env.PORT || 5500;
 
-const authRouter = require('./routes/auth')
+const authRouter = require('./routes/auth');
+const res = require('express/lib/response');
 
-app.use(cors())
-app.use(express.json())
-app.use('/', authRouter)
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded());
+app.use('/', authRouter);
 
 // testing server connect to db
 const dbConnection = async () => {
@@ -29,8 +31,8 @@ dbConnection();
 
 // testing server is running
 app.listen(port, () => {
-    console.log(`App is listening at http://localhost:${port}`);
-})
+  console.log(`App is listening at http://localhost:${port}`);
+});
 
 // all models sync with db
-sequelize.sync({alter: true}).then(()=>console.log('All models synced'))
+sequelize.sync({ alter: true }).then(() => console.log('All models synced'));

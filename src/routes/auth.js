@@ -1,37 +1,44 @@
 require('dotenv').config();
+const cloudinary = require('../utils/cloudinary');
+const upload = require('../utils/multer');
 
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 const db = require('../config/database');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 // signup route
-router.post('/auth/signup', async (req, res) => {
+router.post('/auth/signup', upload.single('avatar'), async (req, res) => {
+  //   console.log(req.body);
     const { username, email, password } = req.body;
-    const avatar = req.file
-  const user = {
-    username: username,
-    email: email,
-  };
-  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+    const user = {
+      username: username,
+      email: email,
+    };
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
 
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({
-      username,
-      email,
-      password: hashedPassword,
-      avatar: avatar,
-    });
-    res.status(201).json({
-      accessToken: accessToken,
-      user: newUser,
-    });
-  } catch (error) {
-    res.status(400).send(error);
-  }
+    try {
+      const avatar = await cloudinary.uploader.upload(req.file.path);
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = await User.create({
+        username,
+        email,
+        password: hashedPassword,
+        avatar: avatar.secure_url,
+      });
+      console.log('before');
+      res.status(201).json({
+        accessToken: accessToken,
+        user: newUser,
+      });
+      console.log('after');
+    } catch (error) {
+      res.status(400).send(error);
+    }
+//   res.status(200).send(req.body);
 });
 
 // login route
