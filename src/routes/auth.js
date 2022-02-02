@@ -9,7 +9,8 @@ const bcrypt = require('bcrypt');
 
 // signup route
 router.post('/auth/signup', async (req, res) => {
-  const { username, email, avatar, password } = req.body;
+    const { username, email, password } = req.body;
+    const avatar = req.file
   const user = {
     username: username,
     email: email,
@@ -18,7 +19,7 @@ router.post('/auth/signup', async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = User.create({
+    const newUser = await User.create({
       username,
       email,
       password: hashedPassword,
@@ -26,7 +27,6 @@ router.post('/auth/signup', async (req, res) => {
     });
     res.status(201).json({
       accessToken: accessToken,
-      id: newUser.user_id,
       user: newUser,
     });
   } catch (error) {
@@ -37,12 +37,12 @@ router.post('/auth/signup', async (req, res) => {
 // login route
 router.post('/auth/login', async (req, res) => {
   const { username, password } = req.body;
-  const user = await User.findOne({ where: { username: username } });
-  if (!user) {
-    res.status(400).send('Cannot find user');
-    return;
-  }
   try {
+    const user = await User.findOne({ where: { username: username } });
+    if (!user) {
+      res.status(400).send('Cannot find user');
+      return;
+    }
     const authentication = await bcrypt.compare(password, user.password);
 
     if (!authentication) {
@@ -58,7 +58,6 @@ router.post('/auth/login', async (req, res) => {
 
     res.json({
       accessToken: accessToken,
-      id: user.user_id,
       user: user,
     });
   } catch (error) {
@@ -81,4 +80,5 @@ const verifyToken = (req, res, next) => {
   next();
 };
 
-module.export = router;
+module.exports = verifyToken;
+module.exports = router;

@@ -12,4 +12,6 @@ const Tag = sequelize.define('tag', {
   },
 });
 
+// Tag.sync({force: true}).then(()=>console.log('Tag table is created')).catch((err)=>console.log('Something wrong with Tag table creation'))
+
 module.exports = Tag;

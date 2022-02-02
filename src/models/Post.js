@@ -21,4 +21,8 @@ const Post = sequelize.define('post', {
   },
 });
 
+// Post.sync({ force: true })
+//   .then(() => console.log('Post table is created'))
+//   .catch((err) => console.log('Post table creation is failed'));
+
 module.exports = Post;
