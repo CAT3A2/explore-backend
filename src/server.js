@@ -3,6 +3,7 @@ dotenv.config();
 
 // Database
 const sequelize = require('./config/database.js');
+const { Client } = require('pg');
 
 const express = require('express');
 const app = express();
@@ -10,7 +11,6 @@ const cors = require('cors');
 const port = process.env.PORT || 5500;
 
 const authRouter = require('./routes/auth');
-const res = require('express/lib/response');
 
 app.use(cors());
 app.use(express.json());
@@ -36,3 +36,13 @@ app.listen(port, () => {
 
 // all models sync with db
 sequelize.sync({ alter: true }).then(() => console.log('All models synced'));
+
+// connect local postgres db to heroku postgres db
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
+
+client.connect();
