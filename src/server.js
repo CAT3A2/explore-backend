@@ -38,11 +38,3 @@ app.listen(port, () => {
 sequelize.sync({ alter: true }).then(() => console.log('All models synced'));
 
 // connect local postgres db to heroku postgres db
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
-
-client.connect();
