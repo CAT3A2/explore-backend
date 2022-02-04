@@ -34,8 +34,7 @@ const User = sequelize.define('user', {
   },
 });
 
-// User.sync({ alter: true })
-//   .then(() => console.log('User table is created'))
-//   .catch((err) => console.log('Something wrong with User table creation'));
+User.belongsToMany(User, { as: 'Followee', foreignKey: 'followee_id', through: 'follows' });
+User.belongsToMany(User, { as: 'Follower', foreignKey: 'follower_id', through: 'follows' });
 
 module.exports = User;
