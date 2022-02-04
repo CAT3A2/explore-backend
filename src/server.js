@@ -11,6 +11,7 @@ const cors = require('cors');
 const port = process.env.PORT || 5500;
 
 const authRouter = require('./routes/auth');
+const setAssociations = require('./config/modelAssociations.js');
 
 app.use(cors());
 app.use(express.json());
@@ -28,6 +29,7 @@ const dbConnection = async () => {
 };
 
 dbConnection();
+setAssociations()
 
 // testing server is running
 app.listen(port, () => {
@@ -35,6 +37,6 @@ app.listen(port, () => {
 });
 
 // all models sync with db
-sequelize.sync({ alter: true }).then(() => console.log('All models synced'));
+sequelize.sync({ force: true }).then(() => console.log('All models synced'));
 
 // connect local postgres db to heroku postgres db

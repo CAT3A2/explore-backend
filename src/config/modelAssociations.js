@@ -14,37 +14,37 @@ const setAssociations = () => {
   // one user as giver can have many comments
   // one comment belongs to one user as giver
   // one to many relations
-  User.hasMany(Comment, { as: 'giver' });
+  User.hasMany(Comment, { as: 'commenter', foreignKey: 'commenter_id' });
   Comment.belongsTo(User);
 
   // one user have many posts
   // one post belongs to one user
   // one to many relations
-  User.hasMany(Post);
+  User.hasMany(Post, { foreignKey: 'user_id' });
   Post.belongsTo(User);
 
   // one user as giver can have many likes
   //one like belongs to one user
   // one to many relations
-  User.hasMany(Like, { as: 'giver' });
+  User.hasMany(Like, { as: 'giver', foreignKey: 'giver_id' });
   Like.belongsTo(User);
 
   // one post have many tags
   // one tag belongs to many post
   // many to many relations
-  Post.belongsToMany(Tag, { through: 'posts_tags' });
-  Tag.belongsToMany(Post, { through: 'posts_tags' });
+  Post.belongsToMany(Tag, { through: 'posts_tags', foreignKey: 'tag_id' });
+  Tag.belongsToMany(Post, { through: 'posts_tags', foreignKey: 'post_id' });
 
   // one post have many comments
   // one comment belongs to one post
   // one to many relations
-  Post.hasMany(Comment);
+  Post.hasMany(Comment, { foreignKey: 'post_id' });
   Comment.belongsTo(Post);
 
   // one post have many likes
   // one like belongs to one post
   // one to many relations
-  Post.hasMany(Like);
+  Post.hasMany(Like, { foreignKey: 'post_id' });
   Like.belongsTo(Post);
 };
 

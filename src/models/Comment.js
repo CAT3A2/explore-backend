@@ -7,8 +7,8 @@ const Comment = sequelize.define('comment', {
   },
 });
 
-// Comment.sync({ force: true })
-//   .then(() => console.log('Comment table is created'))
-//   .catch((err) => console.log('Comment table creation failed'));
+Comment.sync({ force: true })
+  .then(() => console.log('Comment table is created'))
+  .catch((err) => console.log('Comment table creation failed'));
 
 module.exports = Comment;
