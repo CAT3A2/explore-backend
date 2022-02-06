@@ -11,38 +11,37 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 // signup route
-router.post('/auth/signup', upload.single('avatar'), async (req, res) => {
+router.post('/signup', upload.single('avatar'), async (req, res) => {
   //   console.log(req.body);
-    const { username, email, password } = req.body;
-    const user = {
-      username: username,
-      email: email,
-    };
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+  const { username, email, password } = req.body;
+  const user = {
+    username: username,
+    email: email,
+  };
+  const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
 
-    try {
-      const avatar = await cloudinary.uploader.upload(req.file.path);
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = await User.create({
-        username,
-        email,
-        password: hashedPassword,
-        avatar: avatar.secure_url,
-      });
-      console.log('before');
-      res.status(201).json({
-        accessToken: accessToken,
-        user: newUser,
-      });
-      console.log('after');
-    } catch (error) {
-      res.status(400).send(error);
-    }
-//   res.status(200).send(req.body);
+  try {
+    const avatar = await cloudinary.uploader.upload(req.file.path);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      avatar: avatar.secure_url,
+    });
+    res.status(201).json({
+      accessToken: accessToken,
+      user: newUser,
+    });
+    console.log('after');
+  } catch (error) {
+    res.status(400).send(error);
+  }
+  //   res.status(200).send(req.body);
 });
 
 // login route
-router.post('/auth/login', async (req, res) => {
+router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await User.findOne({ where: { username: username } });
@@ -72,20 +71,4 @@ router.post('/auth/login', async (req, res) => {
   }
 });
 
-// Verify Token Middleware
-const verifyToken = (req, res, next) => {
-  // Get auth header value
-  const bearerHeader = req.headers['authorization'];
-  const accessToken = bearerHeader.split(' ')[1];
-
-  if (!bearerHeader) {
-    res.sendStatus(403);
-    return;
-  }
-  req.token = accessToken;
-
-  next();
-};
-
-module.exports = verifyToken;
 module.exports = router;

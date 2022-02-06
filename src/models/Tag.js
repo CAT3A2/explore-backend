@@ -1,8 +1,8 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const Post = require('./Post');
+const { Sequelize, DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
+const Post = require("./Post");
 
-const Tag = sequelize.define('tag', {
+const Tag = sequelize.define("tag", {
   tag_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -12,10 +12,5 @@ const Tag = sequelize.define('tag', {
     type: DataTypes.STRING,
   },
 });
-
-
-Tag.sync({ force: true })
-  .then(() => console.log('Tag table is created'))
-  .catch((err) => console.log('Something wrong with Tag table creation'));
 
 module.exports = Tag;

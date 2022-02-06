@@ -1,12 +1,16 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const Tag = require('./Tag');
+const { Sequelize, DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
+const Tag = require("./Tag");
 
-const Post = sequelize.define('post', {
+const Post = sequelize.define("post", {
   post_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
+  },
+  user_id: {
+    type: DataTypes.INTEGER,
+    require: true,
   },
   title: {
     type: DataTypes.STRING,
@@ -21,10 +25,5 @@ const Post = sequelize.define('post', {
     type: DataTypes.STRING,
   },
 });
-
-
-Post.sync({ force: true })
-  .then(() => console.log('Post table is created'))
-  .catch((err) => console.log('Post table creation is failed'));
 
 module.exports = Post;
