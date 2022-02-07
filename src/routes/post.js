@@ -62,6 +62,7 @@ router.get("/", (req, res) => {
     .catch((err) => console.log(err));
 });
 
+// Get one post details
 router.get("/:id", (req, res) => {
   sequelize
     .sync({ alter: true })

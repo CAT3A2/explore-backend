@@ -12,12 +12,14 @@ const port = process.env.PORT || 5500;
 
 const authRouter = require("./routes/auth");
 const postRouter = require("./routes/post");
+const profileRouter = require("./routes/profile");
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded());
 app.use("/auth", authRouter);
-app.use("/post", postRouter);
+app.use("/posts", postRouter);
+app.use("/profile", profileRouter);
 
 // testing server connect to db
 const dbConnection = async () => {
