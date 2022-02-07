@@ -5,6 +5,7 @@ const User = require("../models/User");
 const Post = require("../models/Post");
 const Comment = require("../models/Comment");
 const Tag = require("../models/Tag");
+const Like = require("../models/Like");
 
 const run = async () => {
   await sequelize.authenticate();
@@ -77,6 +78,21 @@ const run = async () => {
     },
     {
       name: "abc",
+    },
+  ]);
+
+  await Like.bulkCreate([
+    {
+      post_id: post1.post_id,
+      giver_id: user1.user_id,
+    },
+    {
+      post_id: post2.post_id,
+      giver_id: user1.user_id,
+    },
+    {
+      post_id: post2.post_id,
+      giver_id: user2.user_id,
     },
   ]);
 

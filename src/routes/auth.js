@@ -33,7 +33,7 @@ router.post('/signup', upload.single('avatar'), async (req, res) => {
       accessToken: accessToken,
       user: newUser,
     });
-    console.log('after');
+
   } catch (error) {
     res.status(400).send(error);
   }

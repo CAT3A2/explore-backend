@@ -35,7 +35,7 @@ const setAssociations = () => {
   //one like belongs to one user
   // one to many relations
   User.hasMany(Like, { as: "giver", foreignKey: "giver_id" });
-  Like.belongsTo(User);
+  Like.belongsTo(User, { foreignKey: "giver_id" });
 
   // one post have many tags
   // one tag belongs to many post
@@ -53,7 +53,7 @@ const setAssociations = () => {
   // one like belongs to one post
   // one to many relations
   Post.hasMany(Like, { foreignKey: "post_id" });
-  Like.belongsTo(Post);
+  Like.belongsTo(Post, { foreignKey: "post_id" });
 };
 
 module.exports = setAssociations;

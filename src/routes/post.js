@@ -24,19 +24,34 @@ router.get("/", (req, res) => {
       //   return User.findAll({ include: { all: true, nested: true } });
       return Post.findAll({
         order: [["createdAt", "ASC"]],
+        attributes: { exclude: ["createdAt", "updatedAt"] },
         include: [
           {
             model: User,
+            attributes: ["user_id", "username", "avatar"],
           },
           {
             model: Comment,
+            attributes: ["id", "comment"],
             include: {
               model: User,
+              attributes: ["user_id", "username", "avatar"],
             },
           },
           {
             model: Tag,
             attributes: ["name"],
+            through: {
+              attributes: [],
+            },
+          },
+          {
+            model: Like,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+            include: {
+              model: User,
+              attributes: ["username", "avatar"],
+            },
           },
         ],
       });
@@ -45,6 +60,52 @@ router.get("/", (req, res) => {
       res.status(201).json(data);
     })
     .catch((err) => console.log(err));
+});
+
+router.get("/:id", (req, res) => {
+  sequelize
+    .sync({ alter: true })
+    .then(() => {
+      return Post.findOne({
+        where: {
+          post_id: req.params.id,
+        },
+        attributes: { exclude: ["createdAt", "updatedAt"] },
+        include: [
+          {
+            model: User,
+            attributes: ["user_id", "username", "avatar"],
+          },
+          {
+            model: Comment,
+            attributes: ["id", "comment"],
+            include: {
+              model: User,
+              attributes: ["user_id", "username", "avatar"],
+            },
+          },
+          {
+            model: Tag,
+            attributes: ["name"],
+            through: {
+              attributes: [],
+            },
+          },
+          {
+            model: Like,
+            attributes: { exclude: ["createdAt", "updatedAt"] },
+            include: {
+              model: User,
+              attributes: ["username", "avatar"],
+            },
+          },
+        ],
+      });
+    })
+    .then((data) => res.status(200).send(data))
+    .catch((err) => {
+      res.send(err);
+    });
 });
 
 // router.post("/user/:id/posts", verifyToken, async (req, res) => {

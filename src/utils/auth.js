@@ -1,6 +1,5 @@
 // Verify Token Middleware
 const verifyToken = (req, res, next) => {
-  console.log("asdfasdfasdf");
   // Get auth header value
   const bearerHeader = req.headers["authorization"];
   const accessToken = bearerHeader && bearerHeader.split(" ")[1];
@@ -14,6 +13,4 @@ const verifyToken = (req, res, next) => {
   next();
 };
 
-module.exports = {
-  verifyToken,
-};
+module.exports = verifyToken;
