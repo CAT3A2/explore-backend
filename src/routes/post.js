@@ -10,7 +10,7 @@ const upload = require("../utils/multer");
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const { verifyToken } = require("./auth");
+const verifyToken = require("./auth");
 const sequelize = require("../config/database");
 
 // Getting all posts
@@ -82,6 +82,7 @@ router.get("/:id", (req, res) => {
             attributes: ["id", "comment"],
             include: {
               model: User,
+              // as: 'giver',
               attributes: ["user_id", "username", "avatar"],
             },
           },
@@ -107,6 +108,31 @@ router.get("/:id", (req, res) => {
     .catch((err) => {
       res.send(err);
     });
+});
+
+router.post("/:id", async (req, res) => {
+  try {
+    const { comment, user_id, username } = req.body;
+    await sequelize.sync({ alter: true });
+    const newComment = await Post.create({
+      comment,
+      user_id,
+      username,
+    });
+
+    const updatedComments = Comment.findAll({
+      where: {
+        post_id: req.params,
+      },
+    });
+
+    res.status(200).json({
+      newComment,
+      updatedComments,
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
 });
 
 // router.post("/user/:id/posts", verifyToken, async (req, res) => {
@@ -149,18 +175,6 @@ router.get("/:id", (req, res) => {
 //     } catch (err) {
 //       res.status(400).send(error);
 //     }
-//   });
-// });
-
-// router.post("/posts/:id", verifyToken, async (req, res) => {
-//   jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, data) => {
-//     if (err) {
-//       res.sendStatus(403);
-//       return;
-//     }
-//     const current_post = await Post.findOne({
-//       where: { post_id: req.params.id },
-//     });
 //   });
 // });
 

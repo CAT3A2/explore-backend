@@ -32,6 +32,18 @@ const run = async () => {
       password: "123456",
       avatar: "",
     },
+    {
+      username: "koo",
+      email: "koo@test.com",
+      password: "123456",
+      avatar: "",
+    },
+    {
+      username: "Tee",
+      email: "Tee@test.com",
+      password: "123456",
+      avatar: "",
+    },
   ]);
 
   const [post1, post2] = await Post.bulkCreate([
@@ -81,6 +93,8 @@ const run = async () => {
     },
   ]);
 
+  
+
   await Like.bulkCreate([
     {
       post_id: post1.post_id,
@@ -91,7 +105,7 @@ const run = async () => {
       giver_id: user1.user_id,
     },
     {
-      post_id: post2.post_id,
+      post_id: post2.post_ids,
       giver_id: user2.user_id,
     },
   ]);
