@@ -13,10 +13,99 @@ const jwt = require("jsonwebtoken");
 const verifyToken = require("./auth");
 const sequelize = require("../config/database");
 
-// Getting all posts
+// Getting all searched posts
+router.get("/", async (req, res) => {
+  try {
+    await sequelize.sync({ alter: true });
+    const query = req.query.search;
+
+    const foundPosts = await Post.findAll({
+      where: {
+        destination: query,
+      },
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+      include: [
+        {
+          model: Comment,
+          attributes: ["comment"],
+        },
+        {
+          model: User,
+          attributes: ["username", "email", "avatar"],
+        },
+        {
+          model: Tag,
+          attributes: ["name"],
+          through: {
+            attributes: [],
+          },
+        },
+        {
+          model: Like,
+          attributes: ["giver_id", "post_id"],
+        },
+      ],
+    });
+
+    const foundFromTags = await Tag.findAll({
+      where: {
+        name: query,
+      },
+      include: [
+        {
+          model: Post,
+          attributes: {
+            exclude: ["createdAt", "updatedAt"],
+          },
+          include: [
+            {
+              model: Comment,
+              attributes: ["comment"],
+            },
+            {
+              model: User,
+              attributes: ["username", "email", "avatar"],
+            },
+            {
+              model: Tag,
+              attributes: ["name"],
+              through: {
+                attributes: [],
+              },
+            },
+            {
+              model: Like,
+              attributes: ["giver_id", "post_id"],
+            },
+          ],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+    });
+
+    let tagPosts = foundFromTags[0].posts;
+
+    // return all posts contain the searching query from either tags or destination
+    const ids = new Set(foundPosts.map((d) => d.post_id));
+    console.log(ids);
+    let returnPosts = [
+      ...foundPosts,
+      ...tagPosts.filter((d) => !ids.has(d.post_id)),
+    ];
+
+    res.status(200).send(returnPosts);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ error: error.message });
+  }
+});
 
 // Getting all users posts for home page
-router.get("/", (req, res) => {
+router.get("/all", (req, res) => {
   sequelize
     .sync({ alter: true })
     .then(() => {
@@ -112,7 +201,7 @@ router.get("/:id", (req, res) => {
 
 router.post("/:id/comment", verifyToken, async (req, res) => {
   try {
-    const { comment, user_id, username } = req.body;
+    const { comment, user_id } = req.body;
     await sequelize.sync({ alter: true });
     const newComment = await Comment.create({
       comment,
@@ -134,50 +223,5 @@ router.post("/:id/comment", verifyToken, async (req, res) => {
     res.status(400).send(error);
   }
 });
-
-
-
-// router.post("/user/:id/posts", verifyToken, async (req, res) => {
-//   jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, data) => {
-//     if (err) {
-//       res.sendStatus(403);
-//       return;
-//     }
-//     try {
-//       const { title, destination, description } = req.body;
-//       const image_url = await cloudinary.uploader.upload(req.file.path);
-//       const current_user = await User.findOne({
-//         where: { user_id: req.params.id },
-//       });
-//       const new_post = await current_user.addPosts({
-//         title,
-//         destination,
-//         description,
-//         image_url,
-//       });
-//       res.status(201).json(new_post);
-//     } catch (err) {
-//       res.status(400).send(error);
-//     }
-//   });
-// });
-
-// router.get("user/:id/posts", verifyToken, async (req, res) => {
-//   jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, data) => {
-//     if (err) {
-//       res.sendStatus(403);
-//       return;
-//     }
-//     try {
-//       const posts = await Post.findAll({
-//         where: { user_id: req.params.id },
-//         include: { all: true, nested: true },
-//       });
-//       res.status(201).json(posts);
-//     } catch (err) {
-//       res.status(400).send(error);
-//     }
-//   });
-// });
 
 module.exports = router;
