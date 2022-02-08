@@ -16,7 +16,7 @@ const verifyToken = require("./auth");
 const sequelize = require("../config/database");
 
 // Getting all information for user
-router.get("/:id/posts", verifyToken, async (req, res) => {
+router.get("/:id/posts", async (req, res) => {
   try {
     await sequelize.sync({ alter: true });
     const current_user = await User.findOne({
@@ -89,7 +89,7 @@ router.post(
   async (req, res) => {
     try {
       await sequelize.sync({ alter: true });
-      const { title, destination, description } = req.body;
+      const { title, destination, description, tags } = req.body;
       const image_url = await cloudinary.uploader.upload(req.file.path);
       const current_user = await User.findOne({
         where: { user_id: parseInt(req.params.id) },
@@ -102,6 +102,23 @@ router.post(
         image_url: image_url.secure_url,
       });
 
+      tags.forEach((tag) => {
+        const existTag = Tag.findOne({
+          where: {
+            name: tag,
+          },
+        });
+        if (!existTag) {
+          Tag.create({
+            name: tag,
+          }).then((newTag) => {
+            newPost.addTag(newTag);
+          });
+        }
+
+        newPost.addTag(existTag.name);
+      });
+
       await current_user.addPost(newPost);
 
       res.status(201).send(newPost);
@@ -112,6 +129,7 @@ router.post(
   }
 );
 
+// user update post
 router.put(
   "/:id/posts/:post_id",
   verifyToken,
@@ -144,6 +162,7 @@ router.put(
   }
 );
 
+//user delete a post
 router.delete(
   "/:id/posts/:post_id",
   verifyToken,
@@ -171,30 +190,5 @@ router.delete(
     }
   }
 );
-
-// router.post("/user/:id/posts", verifyToken, async (req, res) => {
-//   jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, data) => {
-//     if (err) {
-//       res.sendStatus(403);
-//       return;
-//     }
-//     try {
-//       const { title, destination, description } = req.body;
-//       const image_url = await cloudinary.uploader.upload(req.file.path);
-//       const current_user = await User.findOne({
-//         where: { user_id: req.params.id },
-//       });
-//       const new_post = await current_user.addPosts({
-//         title,
-//         destination,
-//         description,
-//         image_url,
-//       });
-//       res.status(201).json(new_post);
-//     } catch (err) {
-//       res.status(400).send(error);
-//     }
-//   });
-// });
 
 module.exports = router;
