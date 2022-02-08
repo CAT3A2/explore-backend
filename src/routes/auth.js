@@ -21,7 +21,9 @@ router.post("/signup", upload.single("avatar"), async (req, res) => {
   const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
 
   try {
-    const avatar = req?.file?.path ? await cloudinary.uploader.upload(req.file.path) : '';
+    const avatar = req?.file?.path
+      ? await cloudinary.uploader.upload(req.file.path)
+      : "";
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
@@ -35,7 +37,7 @@ router.post("/signup", upload.single("avatar"), async (req, res) => {
       user: newUser,
     });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).json(error.errors[0].message);
   }
   //   res.status(200).send(req.body);
 });
