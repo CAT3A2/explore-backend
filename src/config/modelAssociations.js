@@ -42,8 +42,8 @@ const setAssociations = () => {
   // one post have many tags
   // one tag belongs to many post
   // many to many relations
-  Post.belongsToMany(Tag, { through: "posts_tags", foreignKey: "tag_id" });
-  Tag.belongsToMany(Post, { through: "posts_tags", foreignKey: "post_id" });
+  Post.belongsToMany(Tag, { through: "posts_tags", foreignKey: "post_id" });
+  Tag.belongsToMany(Post, { through: "posts_tags", foreignKey: "tag_id" });
 
   // one post have many comments
   // one comment belongs to one post
