@@ -224,4 +224,23 @@ router.post("/:id/comment", verifyToken, async (req, res) => {
   }
 });
 
+router.post("/:id/like", async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    await sequelize.sync({ alter: true });
+    await Like.create({
+      giver_id: user_id,
+      post_id: parseInt(req.params.id),
+    });
+    const allLikes = await Like.findAll({
+      where: {
+        post_id: parseInt(req.params.id),
+      },
+    });
+    res.status(200).send(allLikes);
+  } catch (error) {
+    res.status(400).send({ error: error.message });
+  }
+});
+
 module.exports = router;
