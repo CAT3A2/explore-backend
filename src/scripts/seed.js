@@ -19,7 +19,7 @@ const run = async () => {
     },
   });
 
-  const [user1, user2] = await User.bulkCreate([
+  const [user1, user2, user3, user4] = await User.bulkCreate([
     {
       username: "foo",
       email: "foo@test.com",
@@ -112,6 +112,11 @@ const run = async () => {
 
   await post1.addTags([tag1, tag2, tag3]);
   await post2.addTags([tag3]);
+
+  await user1.addFollowers([user2, user3, user4])
+  await user1.addFollowees([user2, user3])
+  await user2.addFollowees([user1, user4])
+  await user4.addFollowers([user1, user2, user3])
 
   process.exit();
 };

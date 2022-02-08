@@ -21,19 +21,6 @@ const setAssociations = () => {
     through: "follows",
   });
 
-  // User.belongsToMany(User, {
-  //   as: "Followee",
-  //   foreignKey: "user_id",
-  //   otherKey: "followee_id",
-  //   through: "follows",
-  // });
-  // User.belongsToMany(User, {
-  //   as: "Follower",
-  //   foreignKey: "user_id",
-  //   through: "follows",
-  //   otherKey: "follower_id",
-  // });
-
   // one user as giver can have many comments
   // one comment belongs to one user as giver
   // one to many relations

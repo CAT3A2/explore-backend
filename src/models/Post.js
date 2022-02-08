@@ -14,6 +14,12 @@ const Post = sequelize.define("post", {
   },
   title: {
     type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: "Title must exist",
+      },
+    },
   },
   destination: {
     type: DataTypes.STRING,

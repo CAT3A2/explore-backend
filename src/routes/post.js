@@ -110,19 +110,19 @@ router.get("/:id", (req, res) => {
     });
 });
 
-router.post("/:id", async (req, res) => {
+router.post("/:id/comment", verifyToken, async (req, res) => {
   try {
     const { comment, user_id, username } = req.body;
     await sequelize.sync({ alter: true });
-    const newComment = await Post.create({
+    const newComment = await Comment.create({
       comment,
       user_id,
-      username,
+      post_id: req.params.id,
     });
 
-    const updatedComments = Comment.findAll({
+    const updatedComments = await Comment.findAll({
       where: {
-        post_id: req.params,
+        post_id: req.params.id,
       },
     });
 
@@ -134,6 +134,8 @@ router.post("/:id", async (req, res) => {
     res.status(400).send(error);
   }
 });
+
+
 
 // router.post("/user/:id/posts", verifyToken, async (req, res) => {
 //   jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, data) => {

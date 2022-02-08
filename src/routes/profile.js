@@ -5,6 +5,10 @@ const Like = require("../models/Like");
 const Comment = require("../models/Comment");
 const Tag = require("../models/Tag");
 
+const cloudinary = require("../utils/cloudinary");
+const multer = require("multer");
+const upload = require("../utils/multer");
+
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
@@ -56,14 +60,14 @@ router.get("/:id/posts", verifyToken, async (req, res) => {
         },
         {
           association: "Followees",
-          attributes: ["user_id", "username", "email", "password"],
+          attributes: ["user_id", "username", "email"],
           through: {
             attributes: [],
           },
         },
         {
           association: "Followers",
-          attributes: ["user_id", "username", "email", "password"],
+          attributes: ["user_id", "username", "email"],
           through: {
             attributes: [],
           },
@@ -77,7 +81,35 @@ router.get("/:id/posts", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/:id/posts", verifyToken, async (req, res) => {});
+router.post(
+  "/:id/posts",
+  verifyToken,
+  upload.single("image_url"),
+  async (req, res) => {
+    try {
+      await sequelize.sync({ alter: true });
+      const { title, destination, description } = req.body;
+      const image_url = await cloudinary.uploader.upload(req.file.path);
+      const current_user = await User.findOne({
+        where: { user_id: parseInt(req.params.id) },
+      });
+
+      const newPost = await Post.create({
+        title,
+        destination,
+        description,
+        image_url: image_url.secure_url,
+      });
+
+      await current_user.addPost(newPost);
+
+      res.status(201).send(newPost);
+    } catch (error) {
+      console.log(error.message);
+      res.status(400).send({ error: error.message });
+    }
+  }
+);
 
 // router.post("/user/:id/posts", verifyToken, async (req, res) => {
 //   jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, data) => {
