@@ -81,6 +81,7 @@ router.get("/:id/posts", verifyToken, async (req, res) => {
   }
 });
 
+// user create a new post
 router.post(
   "/:id/posts",
   verifyToken,
@@ -106,6 +107,66 @@ router.post(
       res.status(201).send(newPost);
     } catch (error) {
       console.log(error.message);
+      res.status(400).send({ error: error.message });
+    }
+  }
+);
+
+router.put(
+  "/:id/posts/:post_id",
+  verifyToken,
+  upload.single("image_url"),
+  async (req, res) => {
+    try {
+      await sequelize.sync({ alter: true });
+      const { id, post_id } = req.params;
+      const { title, destination, description } = req.body;
+      const image_url = await cloudinary.uploader.upload(req.file.path);
+      const updatedPost = await Post.update(
+        {
+          user_id: id,
+          title,
+          destination,
+          description,
+          image_url: image_url.secure_url,
+        },
+        {
+          where: {
+            post_id: post_id,
+          },
+        }
+      );
+
+      res.status(200).send(updatedPost);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
+    }
+  }
+);
+
+router.delete(
+  "/:id/posts/:post_id",
+  verifyToken,
+  upload.single("image_url"),
+  async (req, res) => {
+    try {
+      await sequelize.sync({ alter: true });
+      const { id, post_id } = req.params;
+      await Post.destroy({
+        where: {
+          post_id: post_id,
+        },
+      });
+      const updatedPosts = await Post.findAll({
+        where: {
+          user_id: id,
+        },
+      });
+      res.status(200).send({
+        message: "selected post has been deleted",
+        updatedPosts: updatedPosts,
+      });
+    } catch (error) {
       res.status(400).send({ error: error.message });
     }
   }
