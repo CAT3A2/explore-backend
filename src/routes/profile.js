@@ -77,7 +77,7 @@ router.get("/:id/posts", async (req, res) => {
     res.status(200).json(current_user);
   } catch (error) {
     console.log(error);
-    res.status(400).send(error);
+    res.status(400).send({ error: error.message });
   }
 });
 
@@ -190,5 +190,14 @@ router.delete(
     }
   }
 );
+
+// user add followee
+
+router.post("/:id/follow", verifyToken, async (req, res) => {
+  try {
+    await sequelize.sync({alter: true})
+    const currentUser = await User.findOne
+  } catch {}
+});
 
 module.exports = router;

@@ -220,11 +220,11 @@ router.post("/:id/comment", verifyToken, async (req, res) => {
       updatedComments,
     });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send({error: error.messages});
   }
 });
 
-router.post("/:id/like", async (req, res) => {
+router.post("/:id/like",  async (req, res) => {
   try {
     const { user_id } = req.body;
     await sequelize.sync({ alter: true });
