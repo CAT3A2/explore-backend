@@ -12,7 +12,7 @@ const upload = require("../utils/multer");
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const verifyToken = require("./auth");
+const verifyToken = require("../utils/auth");
 const sequelize = require("../config/database");
 
 // Getting all information for user
@@ -90,6 +90,13 @@ router.post(
     try {
       await sequelize.sync({ alter: true });
       const { title, destination, description, tags } = req.body;
+
+      // console.log("tags received from frontend", tags);
+      // console.log(typeof tags);
+      // const tempTags = tags.replace(/\["\]/g, "");
+      const tempTags = tags.replace(/[\[\]"]/g, "");
+      const formatedTags = tempTags.split(", ");
+
       const image_url = await cloudinary.uploader.upload(req.file.path);
       const current_user = await User.findOne({
         where: { user_id: parseInt(req.params.id) },
@@ -102,12 +109,13 @@ router.post(
         image_url: image_url.secure_url,
       });
 
-      tags.forEach((tag) => {
-        const existTag = Tag.findOne({
+      formatedTags.forEach((tag) => {
+        let existTag;
+        Tag.findOne({
           where: {
             name: tag,
           },
-        });
+        }).then((tag) => (existTag = tag));
         if (!existTag) {
           Tag.create({
             name: tag,
@@ -115,8 +123,7 @@ router.post(
             newPost.addTag(newTag);
           });
         }
-
-        newPost.addTag(existTag.name);
+        newPost.addTag(existTag);
       });
 
       await current_user.addPost(newPost);
@@ -127,7 +134,6 @@ router.post(
       res.status(400).send({ error: error.message });
     }
   }
-
 );
 
 // user update post
@@ -140,14 +146,22 @@ router.put(
       await sequelize.sync({ alter: true });
       const { id, post_id } = req.params;
       const { title, destination, description } = req.body;
-      const image_url = await cloudinary.uploader.upload(req.file.path);
-      const updatedPost = await Post.update(
+      const currentPost = await Post.findOne({
+        where: {
+          post_id,
+        },
+      });
+      console.log("current_url", currentPost.image_url);
+      const image_url = req.file
+        ? await cloudinary.uploader.upload(req.file.path)
+        : currentPost.image_url;
+      await Post.update(
         {
           user_id: id,
           title,
           destination,
           description,
-          image_url: image_url.secure_url,
+          image_url,
         },
         {
           where: {
@@ -155,6 +169,16 @@ router.put(
           },
         }
       );
+
+      const updatedPost = await Post.findOne({
+        where: {
+          post_id: post_id,
+        },
+        attributes: {
+          exclude: ["createdAt", "updatedAt"],
+        },
+      });
+      // await updatedPost.save()
 
       res.status(200).send(updatedPost);
     } catch (error) {
@@ -196,8 +220,10 @@ router.delete(
 
 router.post("/:id/follow", verifyToken, async (req, res) => {
   try {
-    await sequelize.sync({alter: true})
-    const currentUser = await User.findOne
+    await sequelize.sync({ alter: true });
+    const currentUser = await User.findOne({
+      where: { user_id: parseInt(req.params.id) },
+    });
   } catch {}
 });
 

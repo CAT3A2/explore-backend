@@ -5,15 +5,23 @@ dotenv.config();
 const sequelize = require("./config/database.js");
 const setAssociations = require("./config/modelAssociations");
 
-const express = require("express");
-const app = express();
-const cors = require("cors");
+const app = require('./app')
+
+// const express = require("express");
+// const app = express();
+// const cors = require("cors");
 const port = process.env.PORT || 5500;
 
-const authRouter = require("./routes/auth");
-const postRouter = require("./routes/post");
-const profileRouter = require("./routes/profile");
+// const authRouter = require("./routes/auth");
+// const postRouter = require("./routes/post");
+// const profileRouter = require("./routes/profile");
 
+// app.use(cors());
+// app.use(express.json());
+// app.use(express.urlencoded());
+// app.use("/auth", authRouter);
+// app.use("/posts", postRouter);
+// app.use("/profile", profileRouter);
 // const cors = require('cors');
 
 
@@ -44,4 +52,3 @@ app.listen(port, () => {
   console.log(`App is listening at http://localhost:${port}`);
 });
 
-// connect local postgres db to heroku postgres db

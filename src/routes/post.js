@@ -10,7 +10,7 @@ const upload = require("../utils/multer");
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const verifyToken = require("./auth");
+const verifyToken = require("../utils/auth");
 const sequelize = require("../config/database");
 
 // Getting all searched posts
@@ -220,11 +220,11 @@ router.post("/:id/comment", verifyToken, async (req, res) => {
       updatedComments,
     });
   } catch (error) {
-    res.status(400).send({error: error.messages});
+    res.status(400).send({ error: error.messages });
   }
 });
 
-router.post("/:id/like",  async (req, res) => {
+router.post("/:id/like", async (req, res) => {
   try {
     const { user_id } = req.body;
     await sequelize.sync({ alter: true });
