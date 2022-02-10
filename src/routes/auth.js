@@ -9,6 +9,8 @@ const db = require("../config/database");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const verifyToken = require("../utils/auth");
+const sequelize = require("../config/database");
 
 // signup route
 router.post("/signup", upload.single("avatar"), async (req, res) => {
@@ -40,6 +42,22 @@ router.post("/signup", upload.single("avatar"), async (req, res) => {
     res.status(400).json(error.errors[0].message);
   }
   //   res.status(200).send(req.body);
+});
+
+router.get("/me", verifyToken, async (req, res) => {
+  try {
+    await sequelize.sync({ alter: true });
+    const currentUser = await User.findOne({
+      where: { username: req.user.username },
+      attributes: {
+        exclude: ["password", "createdAt", "updatedAt"],
+      },
+    });
+
+    res.status(200).send(currentUser);
+  } catch (err) {
+    res.status(400).send({ err: err.message });
+  }
 });
 
 // login route
