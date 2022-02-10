@@ -8,7 +8,7 @@ const verifyToken = (req, res, next) => {
   const accessToken = bearerHeader?.split(" ")[1];
 
   if (bearerHeader == null) {
-    return res.sendStatus(403);
+    return res.status(403).json({ message: "You are not authenticated" });
   }
   req.token = accessToken;
 
