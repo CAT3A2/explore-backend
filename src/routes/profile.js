@@ -98,15 +98,14 @@ router.post(
       const formatedTags = tempTags.split(", ");
 
       const image_url = await cloudinary.uploader.upload(req.file.path);
-      const current_user = await User.findOne({
-        where: { user_id: parseInt(req.params.id) },
-      });
+ 
 
       const newPost = await Post.create({
         title,
         destination,
         description,
         image_url: image_url.secure_url,
+        user_id: parseInt(req.params.id)
       });
 
       formatedTags.forEach((tag) => {
@@ -125,8 +124,6 @@ router.post(
         }
         newPost.addTag(existTag);
       });
-
-      await current_user.addPost(newPost);
 
       res.status(201).send(newPost);
     } catch (error) {
