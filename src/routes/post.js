@@ -5,7 +5,6 @@ const Like = require("../models/Like");
 const Comment = require("../models/Comment");
 const Tag = require("../models/Tag");
 
-const cloudinary = require("../utils/cloudinary");
 const upload = require("../utils/multer");
 const express = require("express");
 const router = express.Router();
