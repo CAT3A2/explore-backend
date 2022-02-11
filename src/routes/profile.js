@@ -5,13 +5,12 @@ const Like = require("../models/Like");
 const Comment = require("../models/Comment");
 const Tag = require("../models/Tag");
 
-const cloudinary = require("../utils/cloudinary");
+const { cloudinary, uploadFile } = require("../utils/cloudinary");
 const multer = require("multer");
 const upload = require("../utils/multer");
 
 const express = require("express");
 const router = express.Router();
-const jwt = require("jsonwebtoken");
 const verifyToken = require("../utils/auth");
 const sequelize = require("../config/database");
 
@@ -94,18 +93,16 @@ router.post(
       // console.log("tags received from frontend", tags);
       // console.log(typeof tags);
       // const tempTags = tags.replace(/\["\]/g, "");
-      const tempTags = tags.replace(/[\[\]"]/g, "");
+      const tempTags = (tags || "").replace(/[\[\]"]/g, "");
       const formatedTags = tempTags.split(", ");
 
-      const image_url = await cloudinary.uploader.upload(req.file.path);
- 
-
+      const image_url = await uploadFile(req);
       const newPost = await Post.create({
         title,
         destination,
         description,
-        image_url: image_url.secure_url,
-        user_id: parseInt(req.params.id)
+        image_url: image_url,
+        user_id: parseInt(req.params.id),
       });
 
       formatedTags.forEach((tag) => {
@@ -127,11 +124,9 @@ router.post(
 
       res.status(201).send(newPost);
     } catch (error) {
-      console.log(error.message);
       res.status(400).send({ error: error.message });
     }
   }
-
 );
 
 // user update post

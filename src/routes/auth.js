@@ -1,5 +1,5 @@
 require("dotenv").config();
-const cloudinary = require("../utils/cloudinary");
+const { cloudinary } = require("../utils/cloudinary");
 const upload = require("../utils/multer");
 
 const express = require("express");
@@ -66,7 +66,7 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ where: { username: username } });
     if (!user) {
-      res.status(400).send("Cannot find user");
+      res.status(400).send({ message: "Cannot find user" });
       return;
     }
     const authentication = await bcrypt.compare(password, user.password);
@@ -87,7 +87,7 @@ router.post("/login", async (req, res) => {
       user: user,
     });
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).send({ error: error.message });
   }
 });
 
