@@ -11,7 +11,7 @@ jest.mock("../utils/cloudinary", () => {
 
 const PASSWORD = "password";
 
-describe("Test Auth Routes", () => {
+describe("Test Auth and Profile Routes", () => {
   let token = null;
   let username = null;
   let userId = null;
@@ -67,6 +67,31 @@ describe("Test Auth Routes", () => {
     expect(res.body.user_id).toBe(userId);
   });
 
+  test("Get user's posts | GET /profile/{id}/posts", async () => {
+    const res = await request(app).get(`/profile/${userId}/posts`);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.user_id).toBe(userId);
+    expect.arrayContaining(res.body.posts);
+    expect(res.body.posts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          post_id: postId,
+        }),
+      ])
+    );
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        user_id: expect.any(Number),
+        username: expect.any(String),
+        email: expect.any(String),
+        avatar: expect.any(String),
+        posts: expect.any(Array),
+        Followees: expect.any(Array),
+        Followers: expect.any(Array),
+      })
+    );
+  });
+
   test("Update post | PUT /profile/{user_id}/posts/{post_id}", async () => {
     const res = await request(app)
       .put(`/profile/${userId}/posts/${postId}`)
@@ -91,5 +116,3 @@ describe("Test Auth Routes", () => {
     expect(res.statusCode).toBe(200);
   });
 });
-
-// describe("Profile test", () => {});
