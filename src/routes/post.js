@@ -86,9 +86,14 @@ router.get("/", async (req, res) => {
       ],
     });
 
-    let tagPosts = foundFromTags[0].posts;
+    if (foundFromTags.length == 0 && foundPosts.length == 0) {
+      return res.status(200).send({
+        message: "The searching post is not available",
+      });
+    }
 
-    // return all posts contain the searching query from either tags or destination
+    let tagPosts = foundFromTags && foundFromTags[0]?.posts;
+
     const ids = new Set(foundPosts.map((d) => d.post_id));
     console.log(ids);
     let returnPosts = [
